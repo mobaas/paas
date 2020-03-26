@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.mobaas.paas.dao.InfraMapper" >
+
+    <select id="selectHostByIp" resultType="com.mobaas.paas.model.Host">
+    	select *
+    	  from host
+    	  where hostIp=#{hostIp}
+    </select>
+    
+    <select id="selectHostListByGroup" resultType="com.mobaas.paas.model.Host">
+    select *
+      from host
+      where groupId=#{groupId}
+      <if test="state==1">
+      	and state=#{state}
+      </if>
+    </select>
+    
+    <select id="selectHostCount" resultType="java.lang.Integer">
+    select count(*)
+      from host
+    </select>
+    
+    <select id="selectHostList" resultType="com.mobaas.paas.model.Host">
+    select *
+      from host
+    	  limit #{offset}, #{limit}
+    </select>
+    
+    <select id="selectHostTotalForGroup" resultType="java.util.Map">
+    	select groupId, count(*) as total
+    	  from host
+    	  group by groupId
+    </select>
+    
+    <select id="selectHostTotal" resultType="java.lang.Integer">
+    select count(*)
+      from host
+    </select>
+    
+</mapper>

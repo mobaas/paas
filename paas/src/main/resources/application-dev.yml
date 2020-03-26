@@ -1,0 +1,7 @@
+paas:
+  upload-path: /Volumes/SSD1/products/kfayun/paas/upload
+  apps-root: /Volumes/SSD1/products/kfayun/paas/apps
+  kube-config: E:\\test\\kube.config
+  exclude-namespaces: kube-,ingress-
+  
+      

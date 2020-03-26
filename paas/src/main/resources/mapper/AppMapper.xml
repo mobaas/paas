@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.mobaas.paas.dao.AppMapper">
+
+    <insert id="insertAppInfo">
+        insert into appinfo (userId, appId, name, namespace, appSecret, 
+           serviceId, groupId, platform, dockerNo, 
+           	domain, enableTls, serviceId, imageName, environments, volumes,
+           	appVersion, instanceNum, addTime)
+        values (#{userId}, #{appId}, #{name}, #{namespace}, #{appSecret},
+           #{serviceId}, #{groupId}, #{platform}, #{dockerNo}, 
+           #{domain}, #{enableTls}, #{serviceId}, #{imageName}, #{environments}, #{volumes},
+           #{appVersion}, #{instanceNum}, #{addTime})
+        <selectKey resultType="int" keyProperty="id">  
+             select last_insert_id() AS id  
+        </selectKey>
+    </insert>
+    
+    <update id="updateAppInfo">
+    		update appinfo set
+    		  appVersion=#{appVersion},
+    		  instanceNum=#{instanceNum},
+    		  environments=#{environments},
+    		  volumes=#{volumes},
+    		  domain=#{domain},
+    		  enableTls=#{enableTls}
+    		  where id=#{id}
+    </update>
+    
+    <select id="selectAppInfoByDomain" resultType="com.mobaas.paas.model.AppInfo">
+		select * 
+		 from appinfo
+		 where domain=#{domain}
+    </select>
+    
+    <select id="selectAppInfoById" resultType="com.mobaas.paas.model.AppInfo">
+		select ai.*
+		 from appinfo ai
+		 where appId=#{appId}
+    </select>
+    
+    <select id="selectAppInfoCount" resultType="int">
+		select count(*) 
+		 from appinfo
+		 <where>
+		 	<if test="appId != null and appId != ''">
+		 		and instr(appId, #{appId}) = 1
+		 	</if>
+		 </where>
+    </select>
+    
+    <select id="selectAppInfoList" resultType="com.mobaas.paas.model.AppInfo">
+		select * 
+		 from appinfo
+		 <where>
+		 	<if test="appId != null and appId != ''">
+		 		and instr(appId, #{appId}) = 1
+		 	</if>
+		 </where>
+		 order by id desc
+		 limit #{offset}, #{limit}
+    </select>
+ 
+   <select id="selectAppInfoTotal" resultType="int">
+		select count(*) 
+		 from appinfo
+    </select>
+ 	
+  <select id="selectAppVersionCount" resultType="int">
+		select count(*) 
+		 from appversion
+		 <where>
+		 	<if test="appId != null and appId != ''">
+		 		appId=#{appId}
+		 	</if>
+		 </where>
+    </select>
+    
+    <select id="selectAppVersionList" resultType="com.mobaas.paas.model.AppVersion">
+		select * 
+		 from appversion
+		 <where>
+		 	<if test="appId != null and appId != ''">
+		 		appId=#{appId}
+		 	</if>
+		 </where>
+		 order by id desc
+		 limit #{offset}, #{limit}
+    </select>
+    
+    <select id="selectAppVersionLast" resultType="com.mobaas.paas.model.AppVersion">
+    		select *
+    		  from appversion
+    		  where appId=#{appId}
+    		  order by id desc
+    		  limit 1
+    </select>
+    
+    <select id="selectAppVersionByVersion" resultType="com.mobaas.paas.model.AppVersion">
+    		select *
+    		  from appversion
+    		  where appId=#{appId} and version=#{version}
+    </select>
+    
+    <select id="selectAppVersionById" resultType="com.mobaas.paas.model.AppVersion">
+    		select *
+    		  from appversion
+    		  where id=#{id}
+    </select>
+    
+    <insert id="insertAppVersion">
+    		insert into appversion (appId, version, changelog, filename, filePath, 
+    			dataName, dataPath, addTime, state)
+    		values (#{appId}, #{version}, #{changelog}, #{filename}, #{filePath}, 
+    		    #{dataName}, #{dataPath}, #{addTime}, #{state})
+    		<selectKey resultType="int" keyProperty="id">  
+            select last_insert_id() AS id  
+       </selectKey>
+    </insert>
+    
+    <delete id="deleteAppVersion">
+        delete
+    		  from appversion
+    		  where id=#{id}
+    </delete>
+    
+     <insert id="insertAppAction">
+        insert into appaction (appId, version, action, state, addTime)
+        values (#{appId}, #{version}, #{action}, #{state}, #{addTime})
+        <selectKey resultType="int" keyProperty="id">  
+             select last_insert_id() AS id  
+        </selectKey>
+    </insert>
+    
+    <update id="updateAppAction">
+    	update appaction set
+    	 state=#{state},
+    	 result=#{result}
+    	 where id=#{id}
+    </update>
+    
+    <select id="selectAppActionCount" resultType="java.lang.Integer">
+    	select count(*)
+    	  from appaction
+    	  <where>
+    	 	<if test="appId!=null and appId!=''">
+    	 		appId=#{appId}
+    	 	</if>
+    	 </where>
+    </select>
+    
+    <select id="selectAppActionList" resultType="com.mobaas.paas.model.AppAction">
+    	select *
+    	 from appaction
+    	 <where>
+    	 	<if test="appId!=null and appId!=''">
+    	 		appId=#{appId}
+    	 	</if>
+    	 </where>
+    	 order by id desc
+    	 limit #{offset}, #{limit}
+    </select>
+    
+    <select id="selectDockerByNo" resultType="com.mobaas.paas.model.Docker">
+    	select *
+    	  from docker
+    	  where dockerNo=#{dockerNo}
+    </select>
+    
+</mapper>

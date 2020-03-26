@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.mobaas.paas.dao.AdminMapper" >
+
+  <select id="selectAdminById" resultType="com.mobaas.paas.model.Admin"  >
+    select *
+    from admin
+    where  id = #{id}
+  </select>
+  
+  <select id="selectAdminByName" resultType="com.mobaas.paas.model.Admin"  >
+    select *
+    from admin
+    where  username = #{username}
+  </select>
+  
+  <select id="selectAdminCount" resultType="int">
+  	select count(*)
+  	  from admin
+  </select>
+  
+   <select id="selectAdminList" resultType="com.mobaas.paas.model.Admin">
+  	select *
+  	  from admin
+       order by id desc
+  	  limit #{offset}, #{limit}
+  </select>
+  
+  <select id="selectAdminCountByName" resultType="int">
+    select count(*)
+    from admin
+    where  username = #{username}
+  </select>
+  
+  <delete id="deleteAdmin">
+    delete from admin
+    where id = #{id}
+  </delete>
+  
+  <insert id="insertAdmin">
+    insert into admin ( username, password, state )
+    values ( #{username}, #{password}, #{state})
+    <selectKey resultType="int" keyProperty="id">  
+            select last_insert_id() AS id  
+       </selectKey>
+  </insert>
+
+  <update id="updateAdmin">
+    update admin set 
+      password = #{password},
+      state = #{state},
+      loginIp = #{loginIp},
+      loginTime = #{loginTime}
+    where id = #{id}
+  </update>
+  
+</mapper>
