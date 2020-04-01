@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.mobaas.paas.dao.MetricsMapper">
+
+    <insert id="insertPodMetrics">
+        insert into podmetrics (appId, podName, timestamp, cpuUsage, memoryUsage)
+        values (#{appId}, #{podName}, #{timestamp}, #{cpuUsage}, #{memoryUsage})
+    </insert>
+    
+    <select id="selectPodMetricsList" resultType="com.mobaas.paas.model.PodMetrics">
+        select *
+          from podmetrics
+           where appId=#{appId} and podName=#{podName}
+           order by id desc
+           limit #{limit}
+    </select>
+    
+    <select id="selectPodMetricsListForGroup" resultType="com.mobaas.paas.model.PodMetrics">
+        select appId, podName,
+           from_unixtime(unix_timestamp(`timestamp`) div #{interval} * #{interval}) `timestamp`,
+            avg(cpuUsage) cpuUsage,
+            avg(memoryUsage) memoryUsage
+            from podmetrics
+        where appId=#{appId} and podName=#{podName}    
+        group by appId, podName, unix_timestamp(`timestamp`) div #{interval} * #{interval}
+        order by `timestamp` desc
+    </select>
+    
+    <delete id="deletePodMetricsBeforeTime">
+        delete
+          from podmetrics
+          where timestamp &gt; #{time}
+    </delete>
+    
+    <insert id="insertNodeMetrics">
+        insert into nodemetrics (nodeName, timestamp, cpuUsage, memoryUsage)
+        values (#{nodeName}, #{timestamp}, #{cpuUsage}, #{memoryUsage})
+    </insert>
+    
+    <select id="selectNodeMetricsList" resultType="com.mobaas.paas.model.NodeMetrics">
+        select *
+          from nodemetrics
+           where nodeName=#{name}
+           order by id desc
+           limit #{limit}
+    </select>
+    
+    <select id="selectNodeMetricsListForGroup" resultType="com.mobaas.paas.model.NodeMetrics">
+        select nodeName,
+           from_unixtime(unix_timestamp(`timestamp`) div #{interval} * #{interval}) `timestamp`,
+            avg(cpuUsage) cpuUsage,
+            avg(memoryUsage) memoryUsage
+            from nodemetrics
+        where nodeName=#{name}
+        group by nodeName, unix_timestamp(`timestamp`) div #{interval} * #{interval}
+        order by `timestamp` desc
+    </select>
+    
+     <delete id="deleteNodeMetricsBeforeTime">
+        delete
+          from nodemetrics
+          where timestamp &gt; #{time}
+    </delete>
+    
+</mapper>
