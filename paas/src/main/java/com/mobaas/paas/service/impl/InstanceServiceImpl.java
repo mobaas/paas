@@ -19,6 +19,7 @@ import org.springframework.util.StringUtils;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mobaas.paas.model.AppAction;
+import com.mobaas.paas.model.AppGrayVersion;
 import com.mobaas.paas.model.AppInfo;
 import com.mobaas.paas.model.AppVersion;
 import com.mobaas.paas.deploy.Deployer;
@@ -84,6 +85,37 @@ public class InstanceServiceImpl implements InstanceService {
 		appService.insertAppAction(action);
 		
 		es.execute(new DeployRunnable(appInfo, appVer, action));
+	}
+	
+	@Override
+	public void grayDeploy(AppInfo appInfo, AppVersion appVer, AppGrayVersion grayVer) {
+		
+		AppAction action = new AppAction();
+		action.setAppId(appInfo.getAppId());
+		action.setVersion(appVer.getVersion());
+		action.setAction("graydeploy");
+		action.setAddTime(new Date());
+		appService.insertAppAction(action);
+		
+		es.execute(new GrayDeployRunnable(appInfo, appVer, grayVer, action));
+	}
+	
+	@Override
+	public void grayRelease(AppInfo appInfo, AppGrayVersion grayVer) throws ApiException {
+		
+		AppAction action = new AppAction();
+		action.setAppId(appInfo.getAppId());
+		action.setVersion(grayVer.getVersion());
+		action.setAction("grayrelease");
+		action.setAddTime(new Date());
+		appService.insertAppAction(action);
+		
+		String deployName = appInfo.getAppId() + "-" + grayVer.getVersion();
+		V1Deployment deploy = kubeService.queryDeployment(deployName, appInfo.getNamespace());
+	
+		if (deploy != null) {
+			kubeService.deleteDeployment(deployName, appInfo.getNamespace(), null);
+		}
 	}
 	
 	@Override
@@ -231,6 +263,57 @@ public class InstanceServiceImpl implements InstanceService {
 		    			// 版本升级
 		    			deployer.upgrade(appInfo, ver, envMap, volumeList);
 				}
+				
+				action.setState(1);
+			} catch (Exception ex) {
+				ex.printStackTrace();
+				//log.info(String.format("query deployment %s, error: %s", appInfo.getAppId(), ex.getLocalizedMessage()));		
+				action.setState(2);
+				action.setResult(ex.getLocalizedMessage());
+			}
+			
+			appService.updateAppAction(action);
+		}
+		
+	}
+	
+	private class GrayDeployRunnable implements Runnable {
+
+		private AppInfo appInfo;
+		private AppVersion ver;
+		private AppGrayVersion grayVer;
+		private AppAction action;
+		
+		public GrayDeployRunnable(AppInfo appInfo, AppVersion ver, AppGrayVersion grayVer, AppAction action) {
+			this.appInfo = appInfo;
+			this.ver = ver;
+			this.grayVer = grayVer;
+			this.action = action;
+		}
+		
+		@Override
+		public void run() {
+
+			try {
+				Deployer deployer = getDeployer(appInfo.getPlatform());
+				
+				String lockVersion = (appInfo.getAppId() + "_" + ver.getVersion()).intern();
+	
+				synchronized(lockVersion) {
+					deployer.handleFile(appInfo, ver);
+				}
+			
+				Map<String, Object> envMap = new HashMap<>();
+				List<DeploymentVolume> volumeList = new ArrayList<>();
+				getDeploymentData(appInfo, ver, envMap, volumeList);
+		
+				String deployName = appInfo.getAppId() + "-" + ver.getVersion();
+				V1Deployment deploy = kubeService.queryDeployment(deployName, appInfo.getNamespace());
+			
+				if (deploy != null) {
+					kubeService.deleteDeployment(deployName, appInfo.getNamespace(), null);
+				}
+				deployer.grayDeploy(appInfo, ver, grayVer, envMap, volumeList);
 				
 				action.setState(1);
 			} catch (Exception ex) {

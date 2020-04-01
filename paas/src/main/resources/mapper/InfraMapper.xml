@@ -2,6 +2,12 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.mobaas.paas.dao.InfraMapper" >
 
+	<select id="selectHostById" resultType="com.mobaas.paas.model.Host">
+    	select *
+    	  from host
+    	  where id=#{id}
+    </select>
+    
     <select id="selectHostByIp" resultType="com.mobaas.paas.model.Host">
     	select *
     	  from host

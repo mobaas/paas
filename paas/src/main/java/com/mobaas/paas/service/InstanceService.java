@@ -5,6 +5,7 @@ package com.mobaas.paas.service;
 
 import java.io.IOException;
 
+import com.mobaas.paas.model.AppGrayVersion;
 import com.mobaas.paas.model.AppInfo;
 import com.mobaas.paas.model.AppVersion;
 
@@ -19,4 +20,8 @@ public interface InstanceService {
 	void deploy(AppInfo appInfo, AppVersion appVer);
 	
 	void changeNum(AppInfo appInfo, AppVersion appVer) throws IOException, ApiException;
+	
+	void grayDeploy(AppInfo appInfo, AppVersion appVer, AppGrayVersion gver);
+
+	void grayRelease(AppInfo appInfo, AppGrayVersion ver) throws ApiException;
 }

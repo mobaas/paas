@@ -36,11 +36,14 @@ import com.mobaas.paas.deploy.Deployer;
 import com.mobaas.paas.deploy.DeployerFactory;
 import com.mobaas.paas.kubernetes.DeploymentPatchItem;
 import com.mobaas.paas.model.Docker;
+import com.mobaas.paas.model.PodMetrics;
 import com.mobaas.paas.service.AppService;
 import com.mobaas.paas.service.InstanceService;
 import com.mobaas.paas.service.KubeApiService;
+import com.mobaas.paas.service.MetricsService;
 import com.mobaas.paas.model.AppAction;
 import com.mobaas.paas.model.AppEvent;
+import com.mobaas.paas.model.AppGrayVersion;
 import com.mobaas.paas.model.AppInfo;
 import com.mobaas.paas.model.AppInstance;
 import com.mobaas.paas.model.AppVersion;
@@ -71,6 +74,8 @@ public class AppController extends BaseController {
     private InstanceService instService;
 	@Autowired
 	private KubeApiService kubeService;
+	@Autowired
+	private MetricsService metricsService;
 	@Autowired
     private ApplicationContext appContext;
 	@Autowired
@@ -142,9 +147,12 @@ public class AppController extends BaseController {
     			}
     		});
     		
+    		List<AppGrayVersion> grayverlist = appService.selectAppGrayVersionList(appId);
+    		
     		model.addObject("docker", docker);
     		model.addObject("instlist", instlist); // 实例
     		model.addObject("verlist", verlist.getList()); // 版本
+    		model.addObject("grayverlist", grayverlist); // 灰度版本
 
     		model.addObject("hasDomain", !StringUtils.isEmpty(appInfo.getDomain()));
     		
@@ -655,6 +663,47 @@ public class AppController extends BaseController {
     		return mv;
     }
     
+    @GetMapping(value = "instancemetrics")
+    public ModelAndView instanceMetrics(
+    		@RequestParam(value="appid")String appId,
+    		@RequestParam(value = "podname") String podName,
+    		@RequestParam(value = "kind", required=false, defaultValue="1m") String kind) {
+
+		AppInfo appInfo = appService.selectAppInfoById(appId);
+		Docker docker = appService.selectDockerByNo(appInfo.getDockerNo());
+				
+    		List<PodMetrics> list = metricsService.selectPodMetricsList(appId, podName, kind, 60);
+    		List<PodMetrics> list2 = new ArrayList<>(list);
+    		Collections.reverse(list2);
+    		
+    		List<String> dateList = new ArrayList<>();
+    		List<Integer> cpuList = new ArrayList<>();
+    		List<Integer> memoryList = new ArrayList<>();
+
+    		float scale = 100.0f / (docker.getCpuNum() * docker.getCpuPercent() * 10);
+    		
+    		list2.forEach( (usage)-> {
+    			dateList.add("\"" + DateUtil.toHhMmString(usage.getTimestamp()) + "\"");
+    			cpuList.add( Math.round(usage.getCpuUsage() * scale / 1000000) );  //ms
+    			memoryList.add( usage.getMemoryUsage() / 1024);  // mb
+    		});
+    		
+    		ModelAndView mv = new ModelAndView();
+    		mv.addObject("dateList", StringUtils.collectionToCommaDelimitedString(dateList) );
+    		mv.addObject("cpuList", StringUtils.collectionToCommaDelimitedString(cpuList) );
+    		mv.addObject("memoryList", StringUtils.collectionToCommaDelimitedString(memoryList) );
+    		mv.addObject("memoryMax", docker.getMemory());
+    		mv.addObject("cpuMax", 100); //ms
+
+    		mv.addObject("appId", appId);
+    		mv.addObject("podName", podName);
+    		mv.addObject("kind", kind);
+    		
+    		mv.setViewName("/app/instancemetrics");
+    		
+    		return mv;
+    }
+    
     @ResponseBody
     @PostMapping(value = "versiondeploy")
     public JsonResult<Integer> versionDeploy(
@@ -682,6 +731,75 @@ public class AppController extends BaseController {
         
     }
   
+    @GetMapping(value = "grayversiondeploy")
+    public ModelAndView grayVersionDeploy(
+    		@RequestParam("appid")String appId,
+    		@RequestParam("version")String version) {
+    	
+    		AppInfo appInfo = appService.selectAppInfoById(appId);
+        
+    		ModelAndView mv = new ModelAndView();
+    		mv.addObject("app", appInfo);
+    		mv.addObject("version", version);
+    		
+    		mv.setViewName("/app/grayversiondeploy");
+    		return mv;
+    }
+    
+    @ResponseBody
+    @PostMapping(value = "grayversiondeploy")
+    public JsonResult<Integer> grayVersionDeploy(
+    		@RequestParam("appid")String appId,
+    		@RequestParam("version")String version,
+    		@RequestParam("num")int num) throws IOException {
+
+    		AppInfo appInfo = appService.selectAppInfoById(appId);
+		if (version.equals(appInfo.getAppVersion())) {
+			return JsonResult.fail(-1, "此版本为当前版本，请选择其他版本进行部署。");
+		}
+
+		AppVersion ver = appService.selectAppVersionByVersion(appInfo.getAppId(), version);
+		if (ver == null) {
+			return JsonResult.fail(-1, "无效的应用版本。");
+		}
+		
+		AppGrayVersion gver = new AppGrayVersion();
+		gver.setAppId(appId);
+		gver.setVersion(version);
+		gver.setInstanceNum(num);
+		gver.setAddTime(new Date());
+		appService.insertAppGrayVersion(gver);
+		
+		instService.grayDeploy(appInfo, ver, gver);
+	
+		return JsonResult.ok(0);	
+        
+    }
+    
+    @ResponseBody
+    @PostMapping(value = "grayversionrelease")
+    public JsonResult<Integer> grayVersionRelease(
+    		@RequestParam("appid")String appId,
+    		@RequestParam("version")String version) throws IOException, ApiException {
+
+    		AppInfo appInfo = appService.selectAppInfoById(appId);
+		if (version.equals(appInfo.getAppVersion())) {
+			return JsonResult.fail(-1, "此版本为当前版本，请选择其他版本进行部署。");
+		}
+
+		AppGrayVersion ver = appService.selectAppGrayVersionByVersion(appId, version);
+		if (ver == null) {
+			return JsonResult.fail(-1, "无效的灰度版本。");
+		}
+		
+		instService.grayRelease(appInfo, ver);
+	
+		int n = appService.deleteAppGrayVersion(ver.getId());
+		
+		return JsonResult.ok(n);	
+        
+    }
+    
 	private Deployer getDeployer(String platform) {
 		Deployer deployer = deployerFactory.createDeployer(platform);
 		appContext.getAutowireCapableBeanFactory().autowireBean(deployer);

@@ -23,6 +23,11 @@ public class InfraServiceImpl implements InfraService {
 	private InfraMapper infraMapper;
 
 	@Override
+	public Host selectHostById(int id) {
+		return infraMapper.selectHostById(id);
+	}
+
+	@Override
 	public Host selectHostByIp(String hostIp) {
 		return infraMapper.selectHostByIp(hostIp);
 	}

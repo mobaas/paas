@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import com.mobaas.paas.JsonResult;
 import com.mobaas.paas.PageList;
 import com.mobaas.paas.model.AppAction;
+import com.mobaas.paas.model.AppGrayVersion;
 import com.mobaas.paas.model.AppInfo;
 import com.mobaas.paas.model.AppVersion;
 import com.mobaas.paas.model.Docker;
@@ -117,6 +118,26 @@ public class AppServiceImpl implements AppService {
 	@Override
 	public Docker selectDockerByNo(String dockerNo) {
 		return mapper.selectDockerByNo(dockerNo);
+	}
+
+	@Override
+	public List<AppGrayVersion> selectAppGrayVersionList(String appId) {
+		return mapper.selectAppGrayVersionList(appId);
+	}
+
+	@Override
+	public AppGrayVersion selectAppGrayVersionByVersion(String appId, String version) {
+		return mapper.selectAppGrayVersionByVersion(appId, version);
+	}
+
+	@Override
+	public void insertAppGrayVersion(AppGrayVersion gver) {
+		mapper.insertAppGrayVersion(gver);
+	}
+
+	@Override
+	public int deleteAppGrayVersion(int id) {
+		return mapper.deleteAppGrayVersion(id);
 	}
 
 }

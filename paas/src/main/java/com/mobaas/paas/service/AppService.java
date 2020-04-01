@@ -8,6 +8,7 @@ import java.util.List;
 
 import com.mobaas.paas.PageList;
 import com.mobaas.paas.model.AppAction;
+import com.mobaas.paas.model.AppGrayVersion;
 import com.mobaas.paas.model.AppInfo;
 import com.mobaas.paas.model.AppVersion;
 import com.mobaas.paas.model.Docker;
@@ -45,6 +46,16 @@ public interface AppService {
 
 	PageList<AppAction> selectAppActionList(String appId, int pageNo, int pageSize);
 
+	// docker
 	Docker selectDockerByNo(String dockerNo);
+
+	// appgrayversion
+	List<AppGrayVersion> selectAppGrayVersionList(String appId);
+
+	AppGrayVersion selectAppGrayVersionByVersion(String appId, String version);
+
+	void insertAppGrayVersion(AppGrayVersion gver);
+
+	int deleteAppGrayVersion(int id);
 
 }

@@ -12,11 +12,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.util.StringUtils;
 
-import com.mobaas.kubernetes.metrics.apis.MetricsV1beta1Api;
-import com.mobaas.kubernetes.metrics.models.MetricsV1beta1NodeMetrics;
-import com.mobaas.kubernetes.metrics.models.MetricsV1beta1NodeMetricsList;
-import com.mobaas.kubernetes.metrics.models.MetricsV1beta1PodMetrics;
-import com.mobaas.kubernetes.metrics.models.MetricsV1beta1PodMetricsList;
+import com.mobaas.kubernetes.apis.MetricsV1beta1Api;
+import com.mobaas.kubernetes.models.MetricsV1beta1NodeMetrics;
+import com.mobaas.kubernetes.models.MetricsV1beta1NodeMetricsList;
+import com.mobaas.kubernetes.models.MetricsV1beta1PodMetrics;
+import com.mobaas.kubernetes.models.MetricsV1beta1PodMetricsList;
 import com.mobaas.paas.config.PaasConfig;
 import com.mobaas.paas.service.KubeApiService;
 

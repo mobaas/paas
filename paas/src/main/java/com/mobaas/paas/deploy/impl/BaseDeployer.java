@@ -29,6 +29,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.StringUtils;
 
+import com.mobaas.paas.model.AppGrayVersion;
 import com.mobaas.paas.model.AppInfo;
 import com.mobaas.paas.model.AppVersion;
 import com.mobaas.paas.WebApplication;
@@ -98,6 +99,14 @@ public abstract class BaseDeployer implements Deployer {
 		V1Deployment deployment = getDeployment(appInfo, ver, envMap, volumeList);
 		apiService.createDeployment(deployment);
 		
+	}
+	
+	@Override
+	public void grayDeploy(AppInfo appInfo, AppVersion ver, AppGrayVersion gver, Map<String, Object> envMap, List<DeploymentVolume> volumeList) throws ApiException, IOException {
+		handlePaths(appInfo, ver, volumeList);
+		
+		V1Deployment deployment = getGrayDeployment(appInfo, ver, gver, envMap, volumeList);
+		apiService.createDeployment(deployment);
 	}
 	
 	@Override
@@ -193,7 +202,47 @@ public abstract class BaseDeployer implements Deployer {
         // 第四步：加载一个模板，创建一个模板对象。
         Template template = getTemplate(getDeploymentTemplate());
        
-        Map<String, Object> dataModel = getDeploymentModel(appInfo, ver);
+        Map<String, Object> dataModel = getDeploymentModel(appInfo.getAppId(), appInfo.getAppId(), ver.getVersion(), appInfo.getNamespace(), appInfo.getInstanceNum());
+        
+        dataModel.put("volumelist", volumeList);
+        
+        Map<String, Object> envmap = new HashMap<>();
+        envmap.putAll(envMap);
+
+        Map<String, Object> customEnvMap = getCustomEnvironments(appInfo, ver);
+        if (customEnvMap != null && customEnvMap.size() > 0) {
+	    		envmap.putAll(customEnvMap);
+	    }
+        
+        for (DeploymentVolume vol : volumeList) {
+        		if (!StringUtils.isEmpty(vol.getEnvName())) {
+        			envmap.put(vol.getEnvName(), vol.getMountPath());
+        		}
+        }
+        dataModel.put("envmap", envmap);
+
+        String yamlContent = mergeTemplate(template, dataModel);
+        
+        try {
+	        File yamlFile = Paths.get( config.getAppsRoot(), "yaml", appInfo.getAppId() + "-" + ver.getVersion() + ".yaml").toFile();
+        		yamlFile.deleteOnExit();
+	        FileUtils.write(yamlFile, yamlContent, "utf-8");
+        } catch (Exception ex) {
+        		ex.printStackTrace();
+        }
+        
+        return (V1Deployment)Yaml.load(yamlContent);
+	}
+	
+	@Override
+	public V1Deployment getGrayDeployment(AppInfo appInfo, AppVersion ver, AppGrayVersion grayVer, Map<String, Object> envMap, List<DeploymentVolume> volumeList) throws IOException {
+		
+        // 第四步：加载一个模板，创建一个模板对象。
+        Template template = getTemplate(getDeploymentTemplate());
+       
+        String grayDeployName = appInfo.getAppId() + "-" + grayVer.getVersion();
+        String appVersion = grayVer.getVersion() + "-gray";
+        Map<String, Object> dataModel = getDeploymentModel(grayDeployName, appInfo.getAppId(), appVersion, appInfo.getNamespace(), grayVer.getInstanceNum());
         
         dataModel.put("volumelist", volumeList);
         
@@ -275,14 +324,15 @@ public abstract class BaseDeployer implements Deployer {
 		return null;
 	}
 	
-	protected Map<String, Object> getDeploymentModel(AppInfo appInfo, AppVersion version) {
+	protected Map<String, Object> getDeploymentModel(String deployName, String appName, String appVersion, String namespace, int instanceNum) {
 		 // 第五步：创建一个模板使用的数据集，可以是pojo也可以是map。一般是Map。
         Map<String, Object> dataModel = new HashMap<>();
         //向数据集中添加数据
-        dataModel.put("appName", appInfo.getAppId());
-        dataModel.put("namespace", appInfo.getNamespace());
-        dataModel.put("version", version.getVersion());
-        dataModel.put("instanceNum", appInfo.getInstanceNum());
+        dataModel.put("deployeeName", deployName);
+        dataModel.put("appName", appName);
+        dataModel.put("namespace", namespace);
+        dataModel.put("appVersion", appVersion);
+        dataModel.put("instanceNum", instanceNum);
         dataModel.put("containerImage", getContainerImage());
         dataModel.put("containerPort", getContainerPort());
         return dataModel;

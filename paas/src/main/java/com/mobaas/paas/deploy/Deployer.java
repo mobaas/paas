@@ -7,14 +7,9 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
+import com.mobaas.paas.model.AppGrayVersion;
 import com.mobaas.paas.model.AppInfo;
 import com.mobaas.paas.model.AppVersion;
-import com.mobaas.paas.deploy.impl.Java8Deployer;
-import com.mobaas.paas.deploy.impl.JavaDeployer;
-import com.mobaas.paas.deploy.impl.MonoDeployer;
-import com.mobaas.paas.deploy.impl.Php56Deployer;
-import com.mobaas.paas.deploy.impl.Python36Deployer;
-import com.mobaas.paas.deploy.impl.Tomcat8Deployer;
 import com.mobaas.paas.kubernetes.DeploymentVolume;
 
 import io.kubernetes.client.ApiException;
@@ -27,6 +22,8 @@ public interface Deployer {
 	
 	void deploy(AppInfo appInfo, AppVersion ver, Map<String, Object> envMap, List<DeploymentVolume> volumeList) throws ApiException, IOException ;
 
+	void grayDeploy(AppInfo appInfo, AppVersion ver, AppGrayVersion gver, Map<String, Object> envMap, List<DeploymentVolume> volumeList) throws ApiException, IOException ;
+
 	void upgrade(AppInfo appInfo, AppVersion ver, Map<String, Object> envMap, List<DeploymentVolume> volumeList) throws ApiException ;
 	
 	void start(AppInfo appInfo, AppVersion ver, Map<String, Object> envMap, List<DeploymentVolume> volumeList) throws ApiException, IOException ;
@@ -38,6 +35,8 @@ public interface Deployer {
 	void deleteIngress(AppInfo appInfo) throws IOException, ApiException;
 	
 	V1Deployment getDeployment(AppInfo appInfo, AppVersion ver, Map<String, Object> envMap, List<DeploymentVolume> volumeList) throws IOException;
+	
+	V1Deployment getGrayDeployment(AppInfo appInfo, AppVersion ver, AppGrayVersion grayVer, Map<String, Object> envMap, List<DeploymentVolume> volumeList) throws IOException;
 	
 	V1Service getService(AppInfo appInfo) throws IOException;
 	

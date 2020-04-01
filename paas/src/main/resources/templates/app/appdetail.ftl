@@ -120,6 +120,34 @@
                 </#list>
               </#if>
  		  </table>
+ 		  
+ 		   <#if grayverlist?? && grayverlist?size &gt; 0>
+ 		  <div>
+             灰度部署
+          </div>
+           <table class="layui-table">
+          <thead>
+               <tr>
+                    <th>应用版本</th>
+                    <th>实例数量</th>
+                    <th>添加时间</th>
+                    <th>操作</th>
+                </tr>
+                </thead>
+
+                <#list grayverlist as ver>
+                    <tr>
+                        <td class="left">${(ver.version)!}</td>
+                        <td>${(ver.instanceNum)!}</td>
+                        <td>${(ver.addTime)?datetime}</td>
+                        <td>
+                            <a href="javascript:releaseGrayVersion('${ver.version}')" class="layui-btn  layui-btn-normal layui-btn-sm">释放</a>
+                        </td>
+                    </tr>
+                </#list>
+          </table>
+          </#if>
+          
  		  <div>
  		     应用版本
  		  </div>
@@ -146,6 +174,7 @@
 						<td>
 						<#if app.state.constant==1 >
 							<a href="javascript:deployVersion('${ver.version}')" class="layui-btn  layui-btn-normal layui-btn-sm">部署</a>
+							<a href="javascript:deployGrayVersion('${ver.version}')" class="layui-btn  layui-btn-normal layui-btn-sm">灰度部署</a>
 						</#if>	
 						</td>
                     </tr>
@@ -368,6 +397,37 @@
 				'json');
 		}
 		
+		function deployGrayVersion(ver) {
+            //iframe层
+            layui.use('layer', function () {
+                var layer = layui.layer;
+                layer.open({
+                    type: 2,
+                    title: '灰度部署',
+                    shadeClose: false,
+                    shade: 0.8,
+                    area: ['600px', '400px'],
+                    content: '/app/grayversiondeploy?appid=${app.appId}&version=' + ver
+                });
+            });
+        }
+        
+        function releaseGrayVersion(ver) {
+            $.post('/app/grayversionrelease?appid=${app.appId}&version=' + ver, 
+                [],
+                function(json) {
+                    layui.use('layer', function () {
+                        var layer = layui.layer;
+                        if (json.errCode == 0) {
+                             layer.msg('操作已提交，系统处理中。', function() {location.reload();});
+                        } else {
+                            layer.msg(json.errMsg);
+                        }
+                    });
+                }, 
+                'json');
+        }
+        
     </script>    
 </body>
 

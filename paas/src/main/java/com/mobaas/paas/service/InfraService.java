@@ -21,6 +21,8 @@ public interface InfraService {
 
 	List<Host> selectHostListByGroup(int groupId, int state);
 
+	Host selectHostById(int id);
+	
 	Host selectHostByIp(String hostIp);
 
 	Map<Integer, Integer> selectHostTotalForGroup();

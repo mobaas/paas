@@ -8,11 +8,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import com.mobaas.kubernetes.metrics.models.MetricsV1beta1NodeMetrics;
-import com.mobaas.kubernetes.metrics.models.MetricsV1beta1NodeMetricsList;
-import com.mobaas.kubernetes.metrics.models.MetricsV1beta1PodContainer;
-import com.mobaas.kubernetes.metrics.models.MetricsV1beta1PodMetrics;
-import com.mobaas.kubernetes.metrics.models.MetricsV1beta1PodMetricsList;
+import com.mobaas.kubernetes.models.MetricsV1beta1NodeMetrics;
+import com.mobaas.kubernetes.models.MetricsV1beta1NodeMetricsList;
+import com.mobaas.kubernetes.models.MetricsV1beta1PodContainer;
+import com.mobaas.kubernetes.models.MetricsV1beta1PodMetrics;
+import com.mobaas.kubernetes.models.MetricsV1beta1PodMetricsList;
 import com.mobaas.paas.service.KubeApiService;
 
 import io.kubernetes.client.ApiException;

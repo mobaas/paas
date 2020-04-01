@@ -1,7 +1,7 @@
 kind: Deployment
 apiVersion: apps/v1
 metadata:
-  name: ${appName}
+  name: ${deployName}
   namespace: ${namespace}
 spec:
   minReadySeconds: 10
@@ -18,7 +18,7 @@ spec:
     metadata:
       labels:
         k8s-app: ${appName}
-        version: ${version}
+        version: ${appVersion}
     spec:
       containers:
       - name: ${appName}

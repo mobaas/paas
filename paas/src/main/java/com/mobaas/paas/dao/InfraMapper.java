@@ -13,6 +13,9 @@ import com.mobaas.paas.model.Host;
 
 public interface InfraMapper {
 
+	Host selectHostById(
+			@Param("id")int id);
+	
 	Host selectHostByIp(
 			@Param("hostIp")String hostIp);
 
@@ -33,5 +36,5 @@ public interface InfraMapper {
 	List<Map> selectHostTotalForGroup();
 	
 	int selectHostTotal();
-	
+
 }

@@ -10,6 +10,7 @@ import org.apache.ibatis.annotations.Param;
 
 import com.mobaas.paas.JsonResult;
 import com.mobaas.paas.model.AppAction;
+import com.mobaas.paas.model.AppGrayVersion;
 import com.mobaas.paas.model.AppInfo;
 import com.mobaas.paas.model.AppVersion;
 import com.mobaas.paas.model.Docker;
@@ -72,5 +73,17 @@ public interface AppMapper {
 
 	Docker selectDockerByNo(
 			@Param("dockerNo")String dockerNo);
+
+	List<AppGrayVersion> selectAppGrayVersionList(
+			@Param("appId")String appId);
+
+	AppGrayVersion selectAppGrayVersionByVersion(
+			@Param("appId")String appId, 
+			@Param("version")String version);
+
+	void insertAppGrayVersion(AppGrayVersion gver);
+
+	int deleteAppGrayVersion(
+			@Param("id")int id);
 
 }
