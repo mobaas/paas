@@ -19,13 +19,9 @@ public interface InfraService {
 
 	PageList<Host> selectHostList(int groupId, String ip, int pageNo, int pageSize);
 
-	List<Host> selectHostListByGroup(int groupId, int state);
-
 	Host selectHostById(int id);
 	
 	Host selectHostByIp(String hostIp);
-
-	Map<Integer, Integer> selectHostTotalForGroup();
 
 	Integer selectHostTotal();
 

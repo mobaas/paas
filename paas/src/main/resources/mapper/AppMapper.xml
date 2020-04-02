@@ -4,11 +4,11 @@
 
     <insert id="insertAppInfo">
         insert into appinfo (userId, appId, name, namespace, appSecret, 
-           serviceId, groupId, platform, dockerNo, 
+           serviceId, platform, dockerNo, 
            	domain, enableTls, serviceId, imageName, environments, volumes,
            	appVersion, instanceNum, addTime)
         values (#{userId}, #{appId}, #{name}, #{namespace}, #{appSecret},
-           #{serviceId}, #{groupId}, #{platform}, #{dockerNo}, 
+           #{serviceId}, #{platform}, #{dockerNo}, 
            #{domain}, #{enableTls}, #{serviceId}, #{imageName}, #{environments}, #{volumes},
            #{appVersion}, #{instanceNum}, #{addTime})
         <selectKey resultType="int" keyProperty="id">  

@@ -97,6 +97,12 @@
 			<artifactId>spring-boot-starter-freemarker</artifactId>
 		</dependency>
 		
+		<!--quartz定时 -->
+		<dependency>
+			<groupId>org.quartz-scheduler</groupId>
+			<artifactId>quartz</artifactId>
+		</dependency>
+		
 		<!-- https://mvnrepository.com/artifact/org.apache.commons/commons-compress -->
 		<dependency>
 		    <groupId>org.apache.commons</groupId>

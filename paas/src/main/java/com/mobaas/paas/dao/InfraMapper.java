@@ -19,10 +19,6 @@ public interface InfraMapper {
 	Host selectHostByIp(
 			@Param("hostIp")String hostIp);
 
-	List<Host> selectHostListByGroup(
-			@Param("groupId")int groupId,
-			@Param("state")int state);
-
 	int selectHostCount(
 			@Param("groupId")int groupId,
 			@Param("ip")String ip);
@@ -33,8 +29,6 @@ public interface InfraMapper {
 			@Param("offset")int offset,
 			@Param("limit")int limit);
 
-	List<Map> selectHostTotalForGroup();
-	
 	int selectHostTotal();
 
 }

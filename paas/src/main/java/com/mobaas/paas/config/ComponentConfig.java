@@ -15,7 +15,9 @@ import org.springframework.context.annotation.Configuration;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mobaas.paas.AppContextUtil;
+import com.mobaas.paas.TaskSchedulerFactory;
 import com.mobaas.paas.kubernetes.KubeApiServiceImpl;
+import com.mobaas.paas.schedule.DefaultTaskScheduler;
 import com.mobaas.paas.service.KubeApiService;
 
 @Configuration
@@ -34,6 +36,18 @@ public class ComponentConfig implements ApplicationContextAware {
 	@Bean
 	public KubeApiService kubeApiService() throws IOException {
 		return new KubeApiServiceImpl(config);
+	}
+	
+	@Bean
+	public TaskSchedulerFactory taskSchedulerFactory() {
+		TaskSchedulerFactory factory = new TaskSchedulerFactory();
+		factory.setScheduler(defaultTaskScheduler());
+		return factory;
+	}
+	
+	@Bean
+	public DefaultTaskScheduler defaultTaskScheduler() {
+		return new DefaultTaskScheduler();
 	}
 	
 	@Override

@@ -10,7 +10,6 @@ public class Host {
 	private int id;
 	private String hostIp;
 	private String name;
-	private int groupId;
 	private String outerIp;
 	private String instanceId;
 	private String provider;
@@ -43,14 +42,6 @@ public class Host {
 
 	public void setName(String name) {
 		this.name = name;
-	}
-
-	public int getGroupId() {
-		return groupId;
-	}
-
-	public void setGroupId(int groupId) {
-		this.groupId = groupId;
 	}
 
 	public String getOuterIp() {

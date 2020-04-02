@@ -33,11 +33,6 @@ public class InfraServiceImpl implements InfraService {
 	}
 
 	@Override
-	public List<Host> selectHostListByGroup(int groupId, int state) {
-		return infraMapper.selectHostListByGroup(groupId, state);
-	}
-
-	@Override
 	public PageList<Host> selectHostList(int groupId, String ip, int pageNo, int pageSize) {
 		PageList<Host> pglist = new PageList<>();
 		pglist.setTotal( infraMapper.selectHostCount(groupId, ip));
@@ -47,12 +42,6 @@ public class InfraServiceImpl implements InfraService {
 		}
 		
 		return pglist;
-	}
-
-	@Override
-	public Map<Integer, Integer> selectHostTotalForGroup() {
-		List<Map> list = infraMapper.selectHostTotalForGroup();
-		return list.stream().collect(Collectors.toMap(map->(Integer)map.get("groupId"), map->((Long)map.get("total")).intValue()));
 	}
 
 	@Override

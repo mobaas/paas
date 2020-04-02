@@ -8,8 +8,7 @@ package com.mobaas.paas.model;
 public class Notification {
 
 	private int id;
-	private int kind;
-	private int userId;
+	private int name;
 	private String notifier;
 	private String config;
 	
@@ -19,20 +18,13 @@ public class Notification {
 	public void setId(int id) {
 		this.id = id;
 	}
-	public int getKind() {
-		return kind;
+	public int getName() {
+		return name;
 	}
-	public void setKind(int kind) {
-		this.kind = kind;
+	public void setName(int name) {
+		this.name = name;
 	}
 	
-	
-	public int getUserId() {
-		return userId;
-	}
-	public void setUserId(int userId) {
-		this.userId = userId;
-	}
 	public String getNotifier() {
 		return notifier;
 	}

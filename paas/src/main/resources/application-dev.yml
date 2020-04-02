@@ -1,7 +1,12 @@
 paas:
+  schedule:
+    enable: true
+    dispatch-cron: 0 0/1 * * * ?
   upload-path: /Volumes/SSD1/products/kfayun/paas/upload
   apps-root: /Volumes/SSD1/products/kfayun/paas/apps
   kube-config: E:\\test\\kube.config
   exclude-namespaces: kube-,ingress-
-  
-      
+  metrics-keeping-days: 3
+  components:
+    notifiers:
+      dingtalk: com.mobaas.paas.notifier.DingTalkNotifier

@@ -14,6 +14,9 @@ import org.springframework.stereotype.Component;
 @Component
 public class PaasConfig {
 
+	@Value("${paas.schedule.dispatch-cron}")
+    private String dispatchCron;
+	
     @Value("${paas.upload-path}")
     private String uploadPath;
     
@@ -25,6 +28,13 @@ public class PaasConfig {
     
     @Value("${paas.exclude-namespaces}")
     private String excludeNamespaces;
+    
+    @Value("${paas.metrics-keeping-days}")
+    private int metricsKeepingDays;
+    
+    public String getDispatchCron() {
+    	return dispatchCron;
+    }
     
 	public String getUploadPath() {
 		return uploadPath;
@@ -40,6 +50,10 @@ public class PaasConfig {
 	
 	public String getExcludeNamespaces() {
 		return excludeNamespaces;
+	}
+	
+	public int getMetricsKeepingDays() {
+		return metricsKeepingDays;
 	}
 	
 }
