@@ -9,16 +9,26 @@ import java.util.Map;
 
 import org.apache.ibatis.annotations.Param;
 
+import com.mobaas.paas.model.DockerInfo;
 import com.mobaas.paas.model.Host;
 
 public interface InfraMapper {
 
+	DockerInfo selectDockerInfoByNo(
+			@Param("dockerNo")String dockerNo);
+	
+	DockerInfo selectDockerInfoByAppId(
+			@Param("appId")String appId);
+	
 	Host selectHostById(
 			@Param("id")int id);
 	
 	Host selectHostByIp(
 			@Param("hostIp")String hostIp);
-
+	
+	Host selectHostByName(
+			@Param("name")String name);
+	
 	List<Host> selectHostListByGroup(
 			@Param("groupId")int groupId,
 			@Param("state")int state);

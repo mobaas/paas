@@ -8,7 +8,7 @@ import java.text.DecimalFormat;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
-public class Docker {
+public class DockerInfo {
 	
 	private int id;
 	private String dockerNo;

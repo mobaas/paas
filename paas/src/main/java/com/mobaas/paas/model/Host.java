@@ -4,6 +4,7 @@
 package com.mobaas.paas.model;
 
 import java.util.Date;
+import java.util.List;
 
 public class Host {
 
@@ -20,6 +21,7 @@ public class Host {
 	private Date addTime;
 	
 	private int instanceNum;  // calculated
+	private List<NodeMetrics> metricsList;
 
 	public int getId() {
 		return id;
@@ -116,6 +118,13 @@ public class Host {
 	public void setInstanceNum(int instanceNum) {
 		this.instanceNum = instanceNum;
 	}
-	
+
+	public List<NodeMetrics> getMetricsList() {
+		return metricsList;
+	}
+
+	public void setMetricsList(List<NodeMetrics> metricsList) {
+		this.metricsList = metricsList;
+	}
 	
 }

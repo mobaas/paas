@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.mobaas.paas.PageList;
+import com.mobaas.paas.model.DockerInfo;
 import com.mobaas.paas.model.Host;
 import com.mobaas.paas.dao.InfraMapper;
 import com.mobaas.paas.service.InfraService;
@@ -23,6 +24,11 @@ public class InfraServiceImpl implements InfraService {
 	private InfraMapper infraMapper;
 
 	@Override
+	public DockerInfo selectDockerInfoByNo(String dockerNo) {
+		return infraMapper.selectDockerInfoByNo(dockerNo);
+	}
+
+	@Override
 	public Host selectHostById(int id) {
 		return infraMapper.selectHostById(id);
 	}
@@ -31,7 +37,12 @@ public class InfraServiceImpl implements InfraService {
 	public Host selectHostByIp(String hostIp) {
 		return infraMapper.selectHostByIp(hostIp);
 	}
-
+	
+	@Override
+	public Host selectHostByName(String name) {
+		return infraMapper.selectHostByName(name);
+	}
+	
 	@Override
 	public List<Host> selectHostListByGroup(int groupId, int state) {
 		return infraMapper.selectHostListByGroup(groupId, state);

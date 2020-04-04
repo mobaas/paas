@@ -11,7 +11,7 @@ import com.mobaas.paas.model.AppAction;
 import com.mobaas.paas.model.AppGrayVersion;
 import com.mobaas.paas.model.AppInfo;
 import com.mobaas.paas.model.AppVersion;
-import com.mobaas.paas.model.Docker;
+import com.mobaas.paas.model.DockerInfo;
 
 public interface AppService {
 	
@@ -45,9 +45,6 @@ public interface AppService {
 	int updateAppAction(AppAction action);
 
 	PageList<AppAction> selectAppActionList(String appId, int pageNo, int pageSize);
-
-	// docker
-	Docker selectDockerByNo(String dockerNo);
 
 	// appgrayversion
 	List<AppGrayVersion> selectAppGrayVersionList(String appId);

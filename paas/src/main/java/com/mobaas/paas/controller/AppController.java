@@ -35,9 +35,10 @@ import com.mobaas.paas.config.PaasConfig;
 import com.mobaas.paas.deploy.Deployer;
 import com.mobaas.paas.deploy.DeployerFactory;
 import com.mobaas.paas.kubernetes.DeploymentPatchItem;
-import com.mobaas.paas.model.Docker;
+import com.mobaas.paas.model.DockerInfo;
 import com.mobaas.paas.model.PodMetrics;
 import com.mobaas.paas.service.AppService;
+import com.mobaas.paas.service.InfraService;
 import com.mobaas.paas.service.InstanceService;
 import com.mobaas.paas.service.KubeApiService;
 import com.mobaas.paas.service.MetricsService;
@@ -72,6 +73,8 @@ public class AppController extends BaseController {
     private AppService appService;
     @Autowired
     private InstanceService instService;
+    @Autowired
+    private InfraService infraService;
 	@Autowired
 	private KubeApiService kubeService;
 	@Autowired
@@ -138,7 +141,7 @@ public class AppController extends BaseController {
 			ex.printStackTrace();
 		}
     		
-    		Docker docker = appService.selectDockerByNo(appInfo.getDockerNo());
+    		DockerInfo docker = infraService.selectDockerInfoByNo(appInfo.getDockerNo());
  		
     		PageList<AppVersion> verlist = appService.selectAppVersionList(appInfo.getAppId(), 1, 10);
     		verlist.getList().forEach(ver->{
@@ -670,7 +673,7 @@ public class AppController extends BaseController {
     		@RequestParam(value = "kind", required=false, defaultValue="1m") String kind) {
 
 		AppInfo appInfo = appService.selectAppInfoById(appId);
-		Docker docker = appService.selectDockerByNo(appInfo.getDockerNo());
+		DockerInfo docker = infraService.selectDockerInfoByNo(appInfo.getDockerNo());
 				
     		List<PodMetrics> list = metricsService.selectPodMetricsList(appId, podName, kind, 60);
     		List<PodMetrics> list2 = new ArrayList<>(list);
