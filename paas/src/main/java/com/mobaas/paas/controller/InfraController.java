@@ -35,6 +35,7 @@ import io.kubernetes.client.models.V1NamespaceList;
 import io.kubernetes.client.models.V1Pod;
 import io.kubernetes.client.models.V1PodList;
 
+import com.mobaas.paas.model.DockerInfo;
 import com.mobaas.paas.model.Host;
 import com.mobaas.paas.model.NodeMetrics;
 
@@ -53,6 +54,24 @@ public class InfraController  extends BaseController {
 	@Resource
 	private PaasConfig config;
     
+	@GetMapping(value = "dockerlist")
+    public ModelAndView dockerList(
+    			@RequestParam(value = "pageNo", defaultValue = "1", required = false) int pageNo,
+            @RequestParam(value = "pageSize", defaultValue = "10", required = false) int pageSize) {
+        ModelAndView model = new ModelAndView();
+
+        PagerInfo pager = new PagerInfo(pageNo, pageSize);
+        PageList<DockerInfo> pglist = infrService.selectDockerInfoList(pageNo, pageSize);
+        pager.setTotalCount(pglist.getTotal());
+        
+        model.addObject("list", pglist.getList());
+        model.addObject("pager", pager);
+
+        model.setViewName("infr/dockerlist");
+
+        return model;
+    }
+
     @GetMapping(value = "hostlist")
     public ModelAndView hostList(
     			@RequestParam(value = "group", defaultValue = "0", required = false) int group,

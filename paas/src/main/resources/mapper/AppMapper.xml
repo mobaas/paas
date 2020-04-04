@@ -161,10 +161,4 @@
     	 limit #{offset}, #{limit}
     </select>
     
-    <select id="selectDockerByNo" resultType="com.mobaas.paas.model.Docker">
-    	select *
-    	  from docker
-    	  where dockerNo=#{dockerNo}
-    </select>
-    
 </mapper>

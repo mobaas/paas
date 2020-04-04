@@ -21,6 +21,9 @@
             <dd <#if path?starts_with("/infr/host")>class="layui-this"</#if>>
                 <a href="/infr/hostlist">主机列表</a>
             </dd>
+            <dd <#if path?starts_with("/infr/docker")>class="layui-this"</#if>>
+                <a href="/infr/dockerlist">Docker列表</a>
+            </dd>
         </dl>
     </li>
     

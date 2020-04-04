@@ -3,5 +3,14 @@ paas:
   apps-root: /Volumes/SSD1/products/kfayun/paas/apps
   kube-config: E:\\test\\kube.config
   exclude-namespaces: kube-,ingress-
+  alerting:
+    pod-memory-overload: 0.9
+    pod-memory-normal: 0.75
+    pod-cpu-overload: 0.9
+    pod-cpu-normal: 0.75
+    node-memory-overload: 0.9
+    node-memory-normal: 0.75
+    node-cpu-overload: 0.9
+    node-cpu-normal: 0.75
   
       

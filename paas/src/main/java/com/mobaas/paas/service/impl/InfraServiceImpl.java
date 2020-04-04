@@ -70,5 +70,15 @@ public class InfraServiceImpl implements InfraService {
 	public Integer selectHostTotal() {
 		return infraMapper.selectHostTotal();
 	}
+
+	@Override
+	public PageList<DockerInfo> selectDockerInfoList(int pageNo, int pageSize) {
+		PageList<DockerInfo> pglist = new PageList<>(pageNo, pageSize);
+		pglist.setTotal(infraMapper.selectDockerInfoCount());
+		if (pglist.getTotal() > 0) {
+			pglist.setList(infraMapper.selectDockerInfoList(pglist.getOffset(), pageSize));
+		}
+		return null;
+	}
 	
 }

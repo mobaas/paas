@@ -47,4 +47,10 @@ public interface InfraMapper {
 	
 	int selectHostTotal();
 
+	int selectDockerInfoCount();
+
+	List<DockerInfo> selectDockerInfoList(
+			@Param("offset")int offset,
+			@Param("limit")int limit);
+
 }

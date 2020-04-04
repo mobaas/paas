@@ -21,6 +21,8 @@ public interface InfraService {
 	// docker
 	DockerInfo selectDockerInfoByNo(String dockerNo);
 
+	PageList<DockerInfo> selectDockerInfoList(int pageNo, int pageSize);
+
 	PageList<Host> selectHostList(int groupId, String ip, int pageNo, int pageSize);
 
 	List<Host> selectHostListByGroup(int groupId, int state);
