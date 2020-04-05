@@ -29,22 +29,14 @@ public interface InfraMapper {
 	Host selectHostByName(
 			@Param("name")String name);
 	
-	List<Host> selectHostListByGroup(
-			@Param("groupId")int groupId,
-			@Param("state")int state);
-
 	int selectHostCount(
-			@Param("groupId")int groupId,
 			@Param("ip")String ip);
 	
 	List<Host> selectHostList(
-			@Param("groupId")int groupId,
 			@Param("ip")String ip,
 			@Param("offset")int offset,
 			@Param("limit")int limit);
 
-	List<Map> selectHostTotalForGroup();
-	
 	int selectHostTotal();
 
 	int selectDockerInfoCount();

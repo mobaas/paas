@@ -16,7 +16,6 @@ public class AppInfo {
 	private int userId;
 	private String name;
 	private String namespace;
-	private int groupId;
 	 private Date addTime;
 	
 	 private String domain; // 域名
@@ -113,20 +112,6 @@ public class AppInfo {
 	public void setNamespace(String namespace) {
 		this.namespace = namespace;
 	}
-
-
-
-	public int getGroupId() {
-		return groupId;
-	}
-
-
-
-	public void setGroupId(int groupId) {
-		this.groupId = groupId;
-	}
-
-
 
 	public Date getAddTime() {
 		return addTime;

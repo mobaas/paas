@@ -25,6 +25,7 @@ import com.mobaas.paas.PageList;
 import com.mobaas.paas.PagerInfo;
 import com.mobaas.paas.config.PaasConfig;
 import com.mobaas.paas.service.InfraService;
+import com.mobaas.paas.service.InstanceService;
 import com.mobaas.paas.service.KubeApiService;
 import com.mobaas.paas.service.MetricsService;
 import com.mobaas.paas.util.DateUtil;
@@ -52,6 +53,8 @@ public class InfraController  extends BaseController {
 	@Resource
 	private KubeApiService kubeService;
 	@Resource
+	private InstanceService instService;
+	@Resource
 	private PaasConfig config;
     
 	@GetMapping(value = "dockerlist")
@@ -74,16 +77,15 @@ public class InfraController  extends BaseController {
 
     @GetMapping(value = "hostlist")
     public ModelAndView hostList(
-    			@RequestParam(value = "group", defaultValue = "0", required = false) int group,
     			@RequestParam(value = "ip", defaultValue = "", required = false) String ip,
     			@RequestParam(value = "pageNo", defaultValue = "1", required = false) int pageNo,
             @RequestParam(value = "pageSize", defaultValue = "10", required = false) int pageSize) {
         ModelAndView model = new ModelAndView();
 
         PagerInfo pager = new PagerInfo(pageNo, pageSize);
-        PageList<Host> pglist = infrService.selectHostList(group, ip, pageNo, pageSize);
+        PageList<Host> pglist = infrService.selectHostList(ip, pageNo, pageSize);
         
-        Map<String, Integer> instMap = queryInstanceNum();
+        Map<String, Integer> instMap = instService.queryInstanceNumForNode();
 	    if (instMap != null) {
 	        for (Host host : pglist.getList()) {
 	    		if (instMap.containsKey(host.getHostIp())) {
@@ -99,7 +101,6 @@ public class InfraController  extends BaseController {
         model.addObject("list", pglist.getList());
        
         model.addObject("pager", pager);
-        model.addObject("group", group);
         model.addObject("ip", ip);
 
         model.setViewName("infr/hostlist");
@@ -143,42 +144,5 @@ public class InfraController  extends BaseController {
     		return mv;
     }
 
-	private Map<String, Integer> queryInstanceNum() {
-
-		Map<String, Integer> map = new HashMap<>();
-		try {
-			List<V1Pod> list = new ArrayList<>();
 	
-			String[] excludes = config.getExcludeNamespaces().split(",");
-			V1NamespaceList nslist = kubeService.queryNamespaceList();
-			for (V1Namespace ns : nslist.getItems()) {
-				
-				boolean ignore = false;
-				for (String prefix : excludes) {
-					if (ns.getMetadata().getName().startsWith(prefix)) {
-						ignore = true;
-						break;
-					}
-				}
-				
-				if (!ignore) {
-					V1PodList plist = kubeService.queryPodList(null, ns.getMetadata().getName());
-					list.addAll(plist.getItems());
-					
-				}
-			}
-			
-			for (V1Pod pod : list) {
-				String hostIP = pod.getStatus().getHostIP();
-				if (map.containsKey(hostIP)) {
-					map.put(hostIP, map.get(hostIP)+1);
-				} else {
-					map.put(hostIP, 1);
-				}
-			}
-		} catch (ApiException ex) {
-			ex.printStackTrace();
-		}
-		return map;
-	}
 }

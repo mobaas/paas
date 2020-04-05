@@ -23,4 +23,6 @@ public interface MetricsService {
 
 	int deleteNodeMetricsBeforeTime(Date time);
 
+	NodeMetrics selectNodeMetricsLast(String nodeName);
+
 }

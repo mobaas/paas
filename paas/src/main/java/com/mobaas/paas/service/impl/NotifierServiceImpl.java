@@ -1,3 +1,6 @@
+/**
+ * Copyright 2016-2018 mobaas.com
+ */
 package com.mobaas.paas.service.impl;
 
 import java.io.IOException;

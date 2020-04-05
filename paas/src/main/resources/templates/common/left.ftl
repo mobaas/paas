@@ -1,5 +1,7 @@
 <ul class="layui-nav layui-nav-tree" lay-filter="test">
-    
+    <li class="layui-nav-item <#if module=="index">layui-this</#if>">
+        <a href="/index">管理首页</a>
+    </li>     
     <li class="layui-nav-item <#if module=="app">layui-nav-itemed</#if>">
         <a href="javascript:;">应用管理</a>
         <dl class="layui-nav-child">

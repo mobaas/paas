@@ -1,8 +1,9 @@
+/**
+ * Copyright 2016-2018 mobaas.com
+ */
 package com.mobaas.paas.vo;
 
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 import java.util.stream.Collectors;
 
 import com.mobaas.paas.model.Host;
@@ -25,10 +26,6 @@ public class HostVO {
 	
 	public String getName() {
 		return host.getName();
-	}
-	
-	public int getGroupId() {
-		return host.getGroupId();
 	}
 	
 	public String getOuterIp() {

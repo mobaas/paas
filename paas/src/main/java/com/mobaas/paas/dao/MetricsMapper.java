@@ -43,8 +43,8 @@ public interface MetricsMapper {
 			@Param("interval")int interval, 
 			@Param("limit")int limit);
 
-
-
+	NodeMetrics selectNodeMetricsLast(
+			@Param("name")String nodeName);
 
 
 }

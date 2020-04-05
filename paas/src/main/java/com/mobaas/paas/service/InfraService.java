@@ -23,17 +23,13 @@ public interface InfraService {
 
 	PageList<DockerInfo> selectDockerInfoList(int pageNo, int pageSize);
 
-	PageList<Host> selectHostList(int groupId, String ip, int pageNo, int pageSize);
-
-	List<Host> selectHostListByGroup(int groupId, int state);
+	PageList<Host> selectHostList(String ip, int pageNo, int pageSize);
 
 	Host selectHostById(int id);
 
 	Host selectHostByName(String name);
 	
 	Host selectHostByIp(String hostIp);
-
-	Map<Integer, Integer> selectHostTotalForGroup();
 
 	Integer selectHostTotal();
 
