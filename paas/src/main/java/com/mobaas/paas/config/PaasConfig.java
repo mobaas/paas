@@ -20,6 +20,9 @@ public class PaasConfig {
     @Value("${paas.apps-root}")
     private String appsRoot;
     
+    @Value("${paas.build-path}")
+    private String buildPath;
+    
     @Value("${paas.kube-config}")
     private String kubeConfig;
     
@@ -56,6 +59,10 @@ public class PaasConfig {
 	
 	public String getAppsRoot() {
 		return appsRoot;
+	}
+	
+	public String getBuildPath() {
+		return buildPath;
 	}
 	
 	public String getKubeConfig() {

@@ -8,19 +8,6 @@ spring:
   profiles:
     active: dev
 
-  datasource:
-    url: jdbc:mysql://localhost/paas?useUnicode=true&characterEncoding=utf-8&useSSL=false&serverTimezone=GMT%2B8
-    username: root
-    password: abc123
-    driver-class-name: com.mysql.cj.jdbc.Driver
- 
-  redis:
-    database: 1
-    host: localhost
-    port: 6379
-    password: 
-    timeout: 500
-    
   jackson:
     date-format: yyyy-MM-dd HH:mm:ss
     time-zone: GMT+8
@@ -28,12 +15,6 @@ spring:
 mybatis:
   mapper-locations: classpath:mapper/*.xml
       
-paas:
-  upload-path: E:\\test\\paas\\upload
-  apps-root: E:\\test\\paas\\apps
-  kube-config: E:\\test\\kube.config
-  exclude-namespaces: kube-,ingress-
-  
 management:
   metrics:
     export:

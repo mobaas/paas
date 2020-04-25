@@ -12,6 +12,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -53,6 +54,7 @@ import com.mobaas.paas.util.DateUtil;
 import io.kubernetes.client.ApiException;
 import io.kubernetes.client.custom.V1Patch;
 import io.kubernetes.client.models.ExtensionsV1beta1Ingress;
+import io.kubernetes.client.models.V1ContainerStatus;
 import io.kubernetes.client.models.V1Deployment;
 import io.kubernetes.client.models.V1Namespace;
 import io.kubernetes.client.models.V1NamespaceList;
@@ -134,6 +136,15 @@ public class AppController extends BaseController {
     				if (pod.getMetadata().getLabels().containsKey("version")) {
     					inst.setAppVersion(pod.getMetadata().getLabels().get("version"));
     				}
+    				Optional<V1ContainerStatus> contStat = pod.getStatus().getContainerStatuses()
+    						.stream()
+    						.filter((stat)-> { return stat.getName().equals(appId); })
+    						.findFirst();
+    				inst.setReady(contStat.isPresent() ? (contStat.get().isReady() ? 1 : 0) : 0);
+    				
+    				List<PodMetrics> metricsList = metricsService.selectPodMetricsList(appId, inst.getPodName(), "1m", 15);
+    				inst.setMetricsList(metricsList);
+    				
     				instlist.add(inst);
     			}
     		}
@@ -536,6 +547,15 @@ public class AppController extends BaseController {
 				if (pod.getMetadata().getLabels().containsKey("version")) {
 					inst.setAppVersion(pod.getMetadata().getLabels().get("version"));
 				}
+				Optional<V1ContainerStatus> contStat = pod.getStatus().getContainerStatuses()
+						.stream()
+						.filter((stat)-> { return stat.getName().equals(inst.getAppName()); })
+						.findFirst();
+				inst.setReady(contStat.isPresent() ? (contStat.get().isReady() ? 1 : 0) : 0);
+				
+				List<PodMetrics> metricsList = metricsService.selectPodMetricsList(inst.getAppName(), inst.getPodName(), "1m", 15);
+				inst.setMetricsList(metricsList);
+				
 				instlist.add(inst);
         		++n;
 	        }

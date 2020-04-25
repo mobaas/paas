@@ -115,7 +115,7 @@ public class JavaDeployer extends BaseDeployer {
 	}
 	
 	@Override
-	protected Map<String, Object> getDeploymentModel(String deployName, String appName, String appVersion, String namespace, int instanceNum) {
+	protected Map<String, Object> getDeploymentModel(String deployName, String appName, String appVersion, String namespace, int instanceNum, String readinessPath) {
 		
         Map<String, Object> dataModel = new HashMap<>();
         //向数据集中添加数据
@@ -126,6 +126,7 @@ public class JavaDeployer extends BaseDeployer {
         dataModel.put("instanceNum", instanceNum);
         dataModel.put("containerImage", getContainerImage());
         dataModel.put("containerPort", getContainerPort());
+        dataModel.put("readinessPath", readinessPath);
         dataModel.put("metricsPort", MERTICS_PORT);
                        
         return dataModel;
