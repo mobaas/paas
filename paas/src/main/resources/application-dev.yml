@@ -18,6 +18,11 @@ paas:
   apps-root: /Volumes/SSD1/products/kfayun/paas/apps
   kube-config: E:\\test\\kube.config
   exclude-namespaces: kube-,ingress-
+  metrics-keeping-days: 3
+  jobs:
+    - key: metrics-collect
+      clazz: com.mobaas.paas.job.MetricsCollectJob  
+      cron: 0 0/1 * * * ?
   alerting:
     pod-memory-overload: 0.9
     pod-memory-normal: 0.75

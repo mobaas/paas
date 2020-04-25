@@ -29,6 +29,9 @@ public class PaasConfig {
     @Value("${paas.exclude-namespaces}")
     private String excludeNamespaces;
     
+    @Value("${paas.metrics-keeping-days}")
+    private int metricsKeepingDays;
+    
     @Value("${paas.alerting.pod-memory-overload}")
     private float alertingPodMemoryOverload;
 
@@ -71,6 +74,10 @@ public class PaasConfig {
 	
 	public String getExcludeNamespaces() {
 		return excludeNamespaces;
+	}
+	
+	public int getMetricsKeepingDays() {
+		return metricsKeepingDays;
 	}
 	
 	public float getAlertingPodMemoryOverload() {
