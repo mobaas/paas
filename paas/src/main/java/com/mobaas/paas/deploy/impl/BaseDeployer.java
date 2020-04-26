@@ -202,7 +202,7 @@ public abstract class BaseDeployer implements Deployer {
         // 第四步：加载一个模板，创建一个模板对象。
         Template template = getTemplate(getDeploymentTemplate());
        
-        Map<String, Object> dataModel = getDeploymentModel(appInfo.getAppId(), appInfo.getAppId(), ver.getVersion(), appInfo.getNamespace(), appInfo.getInstanceNum());
+        Map<String, Object> dataModel = getDeploymentModel(appInfo.getAppId(), appInfo.getAppId(), ver.getVersion(), appInfo.getNamespace(), appInfo.getInstanceNum(), appInfo.getReadinessPath());
         
         dataModel.put("volumelist", volumeList);
         
@@ -242,7 +242,7 @@ public abstract class BaseDeployer implements Deployer {
        
         String grayDeployName = appInfo.getAppId() + "-" + grayVer.getVersion();
         String appVersion = grayVer.getVersion() + "-gray";
-        Map<String, Object> dataModel = getDeploymentModel(grayDeployName, appInfo.getAppId(), appVersion, appInfo.getNamespace(), grayVer.getInstanceNum());
+        Map<String, Object> dataModel = getDeploymentModel(grayDeployName, appInfo.getAppId(), appVersion, appInfo.getNamespace(), grayVer.getInstanceNum(), appInfo.getReadinessPath());
         
         dataModel.put("volumelist", volumeList);
         
@@ -324,7 +324,7 @@ public abstract class BaseDeployer implements Deployer {
 		return null;
 	}
 	
-	protected Map<String, Object> getDeploymentModel(String deployName, String appName, String appVersion, String namespace, int instanceNum) {
+	protected Map<String, Object> getDeploymentModel(String deployName, String appName, String appVersion, String namespace, int instanceNum, String readinessPath) {
 		 // 第五步：创建一个模板使用的数据集，可以是pojo也可以是map。一般是Map。
         Map<String, Object> dataModel = new HashMap<>();
         //向数据集中添加数据
@@ -335,6 +335,7 @@ public abstract class BaseDeployer implements Deployer {
         dataModel.put("instanceNum", instanceNum);
         dataModel.put("containerImage", getContainerImage());
         dataModel.put("containerPort", getContainerPort());
+        dataModel.put("readinessPath", readinessPath);
         return dataModel;
 	}
 	

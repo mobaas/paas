@@ -4,6 +4,7 @@
 package com.mobaas.paas.service;
 
 import java.io.IOException;
+import java.util.Map;
 
 import com.mobaas.paas.model.AppGrayVersion;
 import com.mobaas.paas.model.AppInfo;
@@ -24,4 +25,8 @@ public interface InstanceService {
 	void grayDeploy(AppInfo appInfo, AppVersion appVer, AppGrayVersion gver);
 
 	void grayRelease(AppInfo appInfo, AppGrayVersion ver) throws ApiException;
+	
+	Map<String, Integer> queryInstanceNumForNode();
+	
+	int queryInstanceTotal();
 }

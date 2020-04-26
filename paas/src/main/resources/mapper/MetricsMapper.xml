@@ -45,6 +45,14 @@
            limit #{limit}
     </select>
     
+    <select id="selectNodeMetricsLast" resultType="com.mobaas.paas.model.NodeMetrics">
+        select *
+          from nodemetrics
+           where nodeName=#{name}
+           order by id desc
+           limit 1
+    </select>
+    
     <select id="selectNodeMetricsListForGroup" resultType="com.mobaas.paas.model.NodeMetrics">
         select nodeName,
            from_unixtime(unix_timestamp(`timestamp`) div #{interval} * #{interval}) `timestamp`,

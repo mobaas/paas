@@ -3,6 +3,7 @@ package com.mobaas.paas.config;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
@@ -17,6 +18,7 @@ public class NotifierConfig {
 	
 	private Map<String, String> notifiers;
 
+	@Autowired
 	private ApplicationContext context;
 	
 	public void setNotifiers(Map<String, String> notifiers) {

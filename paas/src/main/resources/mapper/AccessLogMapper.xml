@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.mobaas.paas.dao.AccessLogMapper">
+
+    <insert id="insertAccessLog">
+        insert into accesslog (host, namespace, ingress, service, `time`, path, method, remoteAddr, status, requestLength, 
+            requestTime, responseLength, upstreamLatency, upstreamResponseTime, upstreamResponseLength, upstreamStatus)
+        values (#{host}, #{namespace}, #{ingress}, #{service}, #{time}, #{path}, #{method}, #{remoteAddr}, #{status}, #{requestLength},
+            #{requestTime}, #{responseLength}, #{upstreamLatency}, #{upstreamResponseTime}, #{upstreamResponseLength}, #{upstreamStatus})
+    </insert>
+    
+     <select id="selectAccessTotalListByDate" resultType="com.mobaas.paas.model.AccessTotal">
+        select  service,
+             DATE_FORMAT(`time`, '%Y-%m-%d') `time`,
+              count(*) total,
+              sum(if (status div 100 = 2, 1, 0)) total20x,
+              sum(if (status div 100 = 3, 1, 0)) total30x,
+              sum(if (status div 100 = 4, 1, 0)) total40x,
+              sum(if (status div 100 = 5, 1, 0)) total50x,
+              count(distinct(remoteAddr)) totalIp,
+              avg(requestTime) avgRequestTime,
+              sum(requestLength) totalRequestBytes,
+              sum(responseLength) totalResponseBytes
+              from accesslog
+             where DATE_FORMAT(`time`, '%Y-%m-%d') = #{date}
+          group by service
+          limit #{offset}, #{limit}   
+    </select>
+    
+    <select id="selectAccessTotalListByService" resultType="com.mobaas.paas.model.AccessTotal">
+        select
+           from_unixtime(unix_timestamp(`time`) div #{interval} * #{interval}) `time`,
+            count(*) total,
+            sum(if (status div 100 = 2, 1, 0)) total20x,
+            sum(if (status div 100 = 3, 1, 0)) total30x,
+            sum(if (status div 100 = 4, 1, 0)) total40x,
+            sum(if (status div 100 = 5, 1, 0)) total50x,
+            count(distinct(remoteAddr)) totalIp,
+            avg(requestTime) avgRequestTime,
+            sum(requestLength) totalRequestBytes,
+            sum(responseLength) totalResponseBytes
+            from accesslog
+           where `time` &gt; #{start}
+             <if test='service!=""'>
+           	 	and service=#{service}
+           	 </if>
+        group by unix_timestamp(`time`) div #{interval} * #{interval}
+        order by `time` desc
+    </select>
+  
+    <select id="selectAccessTotalLast" resultType="com.mobaas.paas.model.AccessTotal">
+        select
+           from_unixtime(unix_timestamp(`time`) div #{interval} * #{interval}) `time`,
+            count(*) total,
+            sum(if (status div 100 = 2, 1, 0)) total20x,
+            sum(if (status div 100 = 3, 1, 0)) total30x,
+            sum(if (status div 100 = 4, 1, 0)) total40x,
+            sum(if (status div 100 = 5, 1, 0)) total50x,
+            count(distinct(remoteAddr)) totalIp,
+            avg(requestTime) avgRequestTime,
+            sum(requestLength) totalRequestBytes,
+            sum(responseLength) totalResponseBytes
+            from accesslog
+           where `time` &gt; #{start}
+        group by unix_timestamp(`time`) div #{interval} * #{interval}
+        order by `time` desc
+        limit 1
+    </select>
+      
+</mapper>

@@ -16,7 +16,7 @@ import com.mobaas.paas.model.AppAction;
 import com.mobaas.paas.model.AppGrayVersion;
 import com.mobaas.paas.model.AppInfo;
 import com.mobaas.paas.model.AppVersion;
-import com.mobaas.paas.model.Docker;
+import com.mobaas.paas.model.DockerInfo;
 import com.mobaas.paas.dao.AppMapper;
 import com.mobaas.paas.service.AppService;
 
@@ -113,11 +113,6 @@ public class AppServiceImpl implements AppService {
 		}
 		
 		return plist;
-	}
-
-	@Override
-	public Docker selectDockerByNo(String dockerNo) {
-		return mapper.selectDockerByNo(dockerNo);
 	}
 
 	@Override

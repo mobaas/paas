@@ -1,47 +1,34 @@
+/**
+ * Copyright 2016-2018 mobaas.com
+ */
 package com.mobaas.paas.notifier;
 
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.web.client.RestTemplate;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mobaas.paas.Notifier;
 
-/**
- * 钉钉机器人通知
- * @author billy zhang
- *
- */
 public class DingTalkNotifier implements Notifier {
-	
+
 	private final String webhookApi = "https://oapi.dingtalk.com/robot/send?access_token=";
 	
+    private RestTemplate restTemplate = new RestTemplate();
     private String atMobiles;
     private String msgtype = "markdown";
     private String sign = "【监控通知】";
-    
-    @Autowired
-    private RestTemplate restTemplate;
-    @Autowired
-    private ObjectMapper jsonMapper;
-    
+
     public void notify(String title, String text, Map<String, Object> config) {
-		String accessToken = (String)config.get("accessToken");
-		
-		Map<String, Object> message = createMessage(title+sign, text);
-		
-		try {
-			String jsonStr = jsonMapper.writeValueAsString(message);
-			restTemplate.postForEntity(webhookApi + accessToken, jsonStr, String.class);
-		} catch (IOException ex) {
-			ex.printStackTrace();
-		}
+    	String accessToken = (String)config.get("accessToken");
+    	String webhookUrl = webhookApi + accessToken;
+    	restTemplate.postForEntity(webhookUrl, createMessage(title+sign, text), Void.class);
     }
     
-    private Map<String, Object> createMessage(String title, String text) {
+    private HttpEntity<Map<String, Object>> createMessage(String title, String text) {
         Map<String, Object> messageJson = new HashMap<>();
         HashMap<String, String> params = new HashMap<>();
         params.put("text", text);
@@ -50,7 +37,9 @@ public class DingTalkNotifier implements Notifier {
         messageJson.put("atMobiles", this.atMobiles);
         messageJson.put("msgtype", this.msgtype);
         messageJson.put(this.msgtype, params);
-        return messageJson;
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON_UTF8);
+        return new HttpEntity<>(messageJson, headers);
     }
 
     private String getAtMobilesString(String s) {
@@ -60,6 +49,26 @@ public class DingTalkNotifier implements Notifier {
             atMobiles.append("@").append(mobile);
         }
         return atMobiles.toString();
+    }
+
+    public void setRestTemplate(RestTemplate restTemplate) {
+        this.restTemplate = restTemplate;
+    }
+
+    public String getAtMobiles() {
+        return atMobiles;
+    }
+
+    public void setAtMobiles(String atMobiles) {
+        this.atMobiles = atMobiles;
+    }
+
+    public String getMsgtype() {
+        return msgtype;
+    }
+
+    public void setMsgtype(String msgtype) {
+        this.msgtype = msgtype;
     }
 
 }

@@ -14,6 +14,12 @@
     	  where hostIp=#{hostIp}
     </select>
     
+     <select id="selectHostByName" resultType="com.mobaas.paas.model.Host">
+    	select *
+    	  from host
+    	  where name=#{name}
+    </select>
+    
     <select id="selectHostCount" resultType="java.lang.Integer">
     select count(*)
       from host
@@ -25,10 +31,26 @@
     	  limit #{offset}, #{limit}
     </select>
     
-    
     <select id="selectHostTotal" resultType="java.lang.Integer">
     select count(*)
       from host
+    </select>
+    
+    <select id="selectDockerInfoByNo" resultType="com.mobaas.paas.model.DockerInfo">
+    	select *
+    	  from dockerinfo
+    	  where dockerNo=#{dockerNo}
+    </select>
+    
+    <select id="selectDockerInfoCount" resultType="java.lang.Integer">
+    select count(*)
+      from dockerinfo
+    </select>
+    
+    <select id="selectDockerInfoList" resultType="com.mobaas.paas.model.DockerInfo">
+    	select *
+    	  from dockerinfo
+    	  limit #{offset}, #{limit}
     </select>
     
 </mapper>

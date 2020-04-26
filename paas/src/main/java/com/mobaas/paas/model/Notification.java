@@ -1,3 +1,6 @@
+/**
+ * Copyright 2016-2018 mobaas.com
+ */
 package com.mobaas.paas.model;
 
 /**
@@ -9,6 +12,7 @@ public class Notification {
 
 	private int id;
 	private int name;
+	private String target;
 	private String notifier;
 	private String config;
 	
@@ -18,13 +22,23 @@ public class Notification {
 	public void setId(int id) {
 		this.id = id;
 	}
+
 	public int getName() {
 		return name;
 	}
+
+	public String getTarget() {
+		return target;
+	}
+
 	public void setName(int name) {
 		this.name = name;
 	}
 	
+	public void setTarget(String target) {
+		this.target = target;
+	}
+
 	public String getNotifier() {
 		return notifier;
 	}

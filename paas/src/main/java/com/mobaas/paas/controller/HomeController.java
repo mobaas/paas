@@ -6,6 +6,9 @@ package com.mobaas.paas.controller;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import javax.imageio.ImageIO;
 import javax.servlet.ServletOutputStream;
@@ -25,10 +28,15 @@ import org.springframework.web.servlet.ModelAndView;
 
 import com.google.code.kaptcha.Producer;
 import com.mobaas.paas.JsonResult;
+import com.mobaas.paas.PageList;
 import com.mobaas.paas.Constants;
 import com.mobaas.paas.model.Admin;
+import com.mobaas.paas.model.Host;
+import com.mobaas.paas.model.NodeMetrics;
 import com.mobaas.paas.service.AdminService;
 import com.mobaas.paas.service.AppService;
+import com.mobaas.paas.service.InfraService;
+import com.mobaas.paas.service.MetricsService;
 import com.mobaas.paas.util.CryptoUtil;
 
 @Controller
@@ -38,6 +46,10 @@ public class HomeController extends BaseController {
 	private AdminService adminService;
 	@Autowired
 	private AppService appService;
+	@Autowired
+	private InfraService infraService;
+	@Autowired
+	private MetricsService metricsService;
 	@Autowired
 	private Producer captchaProducer;
 	
@@ -49,10 +61,61 @@ public class HomeController extends BaseController {
     @RequestMapping(value = "/index")
     public ModelAndView index(){
 
-    	ModelAndView mv = new ModelAndView();
-    	
-    	mv.setViewName("/index");
+	    	int cpuTotal = 0;
+	    	int cpuUsage = 0;
+	    	int memoryTotal = 0;
+	    	float memoryUsage = 0;
+	    PageList<Host> hostlist = infraService.selectHostList("", 1, 100);
+    		for (Host host : hostlist.getList()) {
+    			 cpuTotal += (host.getCpuNum() * 1000); // ms
+    			 memoryTotal += (host.getMemory() >> 10); // gb
+    			 
+    			 NodeMetrics metrics = metricsService.selectNodeMetricsLast(host.getName());
+			 cpuUsage += (metrics.getCpuUsage() / 1000000); // ms
+			 memoryUsage += ((metrics.getMemoryUsage() * 10) >> 20) / 10.0f;  // gb div 2^20 
+    		}
+	    	
+	    	ModelAndView mv = new ModelAndView();
+	    	mv.addObject("hostTotal", hostlist.getTotal());
+	    	mv.addObject("appTotal", appService.selectAppInfoTotal());
+//	    	mv.addObject("podTotal", podTotal);
+	
+	    	mv.addObject("cpuTotal", cpuTotal);
+	    	mv.addObject("cpuUsage", cpuUsage);
+	    	mv.addObject("cpuPercent", Math.round(cpuUsage*1000.0f / cpuTotal) / 10.0f);
+	    	
+	    	mv.addObject("memoryTotal", memoryTotal);
+	    	mv.addObject("memoryUsage", memoryUsage);
+	    	mv.addObject("memoryPercent", Math.round(memoryUsage*1000.0f / memoryTotal) / 10.0f);
+	
+	    	mv.setViewName("/index");
         return mv;
+    }
+
+    @GetMapping("metrics")
+    @ResponseBody
+    public JsonResult<Map<String, Object>> metrics() {
+	    	int cpuTotal = 0;
+	    	int cpuUsage = 0;
+	    	int memoryTotal = 0;
+	    	float memoryUsage = 0;
+	    PageList<Host> hostlist = infraService.selectHostList("", 1, 100);
+    		for (Host host : hostlist.getList()) {
+    			 cpuTotal += (host.getCpuNum() * 1000); // ms
+    			 memoryTotal += (host.getMemory() >> 10); // gb
+
+    			 NodeMetrics metrics = metricsService.selectNodeMetricsLast(host.getName());
+			 cpuUsage += (metrics.getCpuUsage() / 1000000); // ms
+			 memoryUsage += ((metrics.getMemoryUsage() * 10) >> 20) / 10.0f;  // gb div 2^20 
+	    }
+	    
+	    Map<String, Object> data = new HashMap<>();
+	    data.put("cpuUsage", cpuUsage);
+	    data.put("cpuPercent", Math.round(cpuUsage*1000.0f / cpuTotal) / 10.0f);
+	    data.put("memoryUsage", memoryUsage);
+	    data.put("memoryPercent", Math.round(memoryUsage*1000.0f / memoryTotal) / 10.0f);
+	    
+	    return JsonResult.ok(data);
     }
 
     @RequestMapping(value = "/denied")

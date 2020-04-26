@@ -12,6 +12,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,9 +36,10 @@ import com.mobaas.paas.config.PaasConfig;
 import com.mobaas.paas.deploy.Deployer;
 import com.mobaas.paas.deploy.DeployerFactory;
 import com.mobaas.paas.kubernetes.DeploymentPatchItem;
-import com.mobaas.paas.model.Docker;
+import com.mobaas.paas.model.DockerInfo;
 import com.mobaas.paas.model.PodMetrics;
 import com.mobaas.paas.service.AppService;
+import com.mobaas.paas.service.InfraService;
 import com.mobaas.paas.service.InstanceService;
 import com.mobaas.paas.service.KubeApiService;
 import com.mobaas.paas.service.MetricsService;
@@ -52,6 +54,7 @@ import com.mobaas.paas.util.DateUtil;
 import io.kubernetes.client.ApiException;
 import io.kubernetes.client.custom.V1Patch;
 import io.kubernetes.client.models.ExtensionsV1beta1Ingress;
+import io.kubernetes.client.models.V1ContainerStatus;
 import io.kubernetes.client.models.V1Deployment;
 import io.kubernetes.client.models.V1Namespace;
 import io.kubernetes.client.models.V1NamespaceList;
@@ -72,6 +75,8 @@ public class AppController extends BaseController {
     private AppService appService;
     @Autowired
     private InstanceService instService;
+    @Autowired
+    private InfraService infraService;
 	@Autowired
 	private KubeApiService kubeService;
 	@Autowired
@@ -131,6 +136,15 @@ public class AppController extends BaseController {
     				if (pod.getMetadata().getLabels().containsKey("version")) {
     					inst.setAppVersion(pod.getMetadata().getLabels().get("version"));
     				}
+    				Optional<V1ContainerStatus> contStat = pod.getStatus().getContainerStatuses()
+    						.stream()
+    						.filter((stat)-> { return stat.getName().equals(appId); })
+    						.findFirst();
+    				inst.setReady(contStat.isPresent() ? (contStat.get().isReady() ? 1 : 0) : 0);
+    				
+    				List<PodMetrics> metricsList = metricsService.selectPodMetricsList(appId, inst.getPodName(), "1m", 15);
+    				inst.setMetricsList(metricsList);
+    				
     				instlist.add(inst);
     			}
     		}
@@ -138,7 +152,7 @@ public class AppController extends BaseController {
 			ex.printStackTrace();
 		}
     		
-    		Docker docker = appService.selectDockerByNo(appInfo.getDockerNo());
+    		DockerInfo docker = infraService.selectDockerInfoByNo(appInfo.getDockerNo());
  		
     		PageList<AppVersion> verlist = appService.selectAppVersionList(appInfo.getAppId(), 1, 10);
     		verlist.getList().forEach(ver->{
@@ -533,6 +547,15 @@ public class AppController extends BaseController {
 				if (pod.getMetadata().getLabels().containsKey("version")) {
 					inst.setAppVersion(pod.getMetadata().getLabels().get("version"));
 				}
+				Optional<V1ContainerStatus> contStat = pod.getStatus().getContainerStatuses()
+						.stream()
+						.filter((stat)-> { return stat.getName().equals(inst.getAppName()); })
+						.findFirst();
+				inst.setReady(contStat.isPresent() ? (contStat.get().isReady() ? 1 : 0) : 0);
+				
+				List<PodMetrics> metricsList = metricsService.selectPodMetricsList(inst.getAppName(), inst.getPodName(), "1m", 15);
+				inst.setMetricsList(metricsList);
+				
 				instlist.add(inst);
         		++n;
 	        }
@@ -670,7 +693,7 @@ public class AppController extends BaseController {
     		@RequestParam(value = "kind", required=false, defaultValue="1m") String kind) {
 
 		AppInfo appInfo = appService.selectAppInfoById(appId);
-		Docker docker = appService.selectDockerByNo(appInfo.getDockerNo());
+		DockerInfo docker = infraService.selectDockerInfoByNo(appInfo.getDockerNo());
 				
     		List<PodMetrics> list = metricsService.selectPodMetricsList(appId, podName, kind, 60);
     		List<PodMetrics> list2 = new ArrayList<>(list);

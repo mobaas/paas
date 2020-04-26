@@ -4,6 +4,7 @@
 package com.mobaas.paas.model;
 
 import java.util.Date;
+import java.util.List;
 
 public class AppInstance {
 
@@ -14,7 +15,9 @@ public class AppInstance {
 	private String nodeName; // spec/nodeName
 	private String hostIP;  // status/hostIP
 	private String status;  // status/phase
+	private int ready;
 	private Date startTime; // status/startTime
+	private List<PodMetrics> metricsList;
 	
 	public String getPodName() {
 		return podName;
@@ -58,11 +61,24 @@ public class AppInstance {
 	public void setStatus(String status) {
 		this.status = status;
 	}
+	
+	public int getReady() {
+		return ready;
+	}
+	public void setReady(int ready) {
+		this.ready = ready;
+	}
 	public Date getStartTime() {
 		return startTime;
 	}
 	public void setStartTime(Date startTime) {
 		this.startTime = startTime;
+	}
+	public List<PodMetrics> getMetricsList() {
+		return metricsList;
+	}
+	public void setMetricsList(List<PodMetrics> metricsList) {
+		this.metricsList = metricsList;
 	}
 	
 }

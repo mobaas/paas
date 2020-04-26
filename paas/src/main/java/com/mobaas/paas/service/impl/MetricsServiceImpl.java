@@ -75,4 +75,9 @@ public class MetricsServiceImpl implements MetricsService {
 		return mapper.deleteNodeMetricsBeforeTime(time);
 	}
 
+	@Override
+	public NodeMetrics selectNodeMetricsLast(String nodeName) {
+		return mapper.selectNodeMetricsLast(nodeName);
+	}
+
 }

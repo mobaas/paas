@@ -13,7 +13,7 @@ import com.mobaas.paas.model.AppAction;
 import com.mobaas.paas.model.AppGrayVersion;
 import com.mobaas.paas.model.AppInfo;
 import com.mobaas.paas.model.AppVersion;
-import com.mobaas.paas.model.Docker;
+import com.mobaas.paas.model.DockerInfo;
 
 public interface AppMapper {
 
@@ -70,9 +70,6 @@ public interface AppMapper {
 			@Param("appId")String appId, 
 			@Param("offset")int offset, 
 			@Param("limit")int limit);
-
-	Docker selectDockerByNo(
-			@Param("dockerNo")String dockerNo);
 
 	List<AppGrayVersion> selectAppGrayVersionList(
 			@Param("appId")String appId);

@@ -22,6 +22,7 @@ import com.mobaas.paas.model.AppAction;
 import com.mobaas.paas.model.AppGrayVersion;
 import com.mobaas.paas.model.AppInfo;
 import com.mobaas.paas.model.AppVersion;
+import com.mobaas.paas.config.PaasConfig;
 import com.mobaas.paas.deploy.Deployer;
 import com.mobaas.paas.deploy.DeployerFactory;
 import com.mobaas.paas.kubernetes.DeploymentVolume;
@@ -31,6 +32,10 @@ import com.mobaas.paas.service.KubeApiService;
 
 import io.kubernetes.client.ApiException;
 import io.kubernetes.client.models.V1Deployment;
+import io.kubernetes.client.models.V1Namespace;
+import io.kubernetes.client.models.V1NamespaceList;
+import io.kubernetes.client.models.V1Pod;
+import io.kubernetes.client.models.V1PodList;
 
 @Service
 public class InstanceServiceImpl implements InstanceService {
@@ -45,6 +50,8 @@ public class InstanceServiceImpl implements InstanceService {
     private ApplicationContext appContext;
 	@Autowired
 	private DeployerFactory deployerFactory;
+	@Autowired
+	private PaasConfig config;
 	
 	private static ExecutorService es = Executors.newCachedThreadPool(); 
 
@@ -127,6 +134,75 @@ public class InstanceServiceImpl implements InstanceService {
 		getDeployer(appInfo.getPlatform()).deploy(appInfo, appVer, envMap, volumeList);
 	}
 
+	@Override
+	public Map<String, Integer> queryInstanceNumForNode() {
+
+		Map<String, Integer> map = new HashMap<>();
+		try {
+			List<V1Pod> list = new ArrayList<>();
+	
+			String[] excludes = config.getExcludeNamespaces().split(",");
+			V1NamespaceList nslist = kubeService.queryNamespaceList();
+			for (V1Namespace ns : nslist.getItems()) {
+				
+				boolean ignore = false;
+				for (String prefix : excludes) {
+					if (ns.getMetadata().getName().startsWith(prefix)) {
+						ignore = true;
+						break;
+					}
+				}
+				
+				if (!ignore) {
+					V1PodList plist = kubeService.queryPodList(null, ns.getMetadata().getName());
+					list.addAll(plist.getItems());
+					
+				}
+			}
+			
+			for (V1Pod pod : list) {
+				String hostIP = pod.getStatus().getHostIP();
+				if (map.containsKey(hostIP)) {
+					map.put(hostIP, map.get(hostIP)+1);
+				} else {
+					map.put(hostIP, 1);
+				}
+			}
+		} catch (ApiException ex) {
+			ex.printStackTrace();
+		}
+		return map;
+	}
+
+	@Override
+	public int queryInstanceTotal() {
+		int total = 0;
+		try {
+			String[] excludes = config.getExcludeNamespaces().split(",");
+			V1NamespaceList nslist = kubeService.queryNamespaceList();
+			for (V1Namespace ns : nslist.getItems()) {
+				
+				boolean ignore = false;
+				for (String prefix : excludes) {
+					if (ns.getMetadata().getName().startsWith(prefix)) {
+						ignore = true;
+						break;
+					}
+				}
+				
+				if (!ignore) {
+					V1PodList plist = kubeService.queryPodList(null, ns.getMetadata().getName());
+					total += plist.getItems().size();
+					
+				}
+			}
+		} catch (ApiException ex) {
+			ex.printStackTrace();
+		}
+		
+		return total;
+	}
+	
 	private Deployer getDeployer(String platform) {
 		Deployer deployer = deployerFactory.createDeployer(platform);
 		appContext.getAutowireCapableBeanFactory().autowireBean(deployer);
